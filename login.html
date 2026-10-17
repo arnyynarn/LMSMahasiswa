@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portal SSO Terpadu - Universitas Pelita Bangsa (SIAKAD & LMS)</title>
+<meta name="description" content="Portal Single Sign-On terpadu untuk SIAKAD dan Smart LMS Universitas Pelita Bangsa. Akses jadwal kuliah, tugas, KRS, dan pembayaran UKT."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',100: '#ede9fe',200: '#ddd6fe',300: '#c4b5fd',400: '#a78bfa',
+              500: '#8b5cf6',600: '#6366f1',700: '#4f46e5',800: '#4338ca',900: '#312e81',950: '#1e1b4b',
+            },
+            surface: { canvas: '#f1f0f7', card: '#ffffff', cardMuted: '#f8f8fc', border: '#e8e6f2' }
+          },
+          boxShadow: {
+            'soft-clay': '0 20px 45px -15px rgba(99, 102, 241, 0.08), 0 8px 16px -6px rgba(0, 0, 0, 0.04)',
+            'card-lift': '0 12px 30px -8px rgba(79, 70, 229, 0.12)',
+            'accent-glow': '0 10px 25px -5px rgba(99, 102, 241, 0.4)'
+          }
+        }
+      }
+    }
+</script>
+<link rel="stylesheet" href="css/login.css"/>
+</head>
+<body class="font-sans text-slate-800 antialiased p-0 m-0 min-h-screen flex items-center justify-center">
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-6 right-6 z-50 hidden">
+  <div class="toast-notification bg-white rounded-2xl shadow-card-lift border border-slate-200 p-4 flex items-center gap-3 max-w-sm">
+    <div id="toast-icon" class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"></div>
+    <div>
+      <p id="toast-title" class="text-sm font-bold text-slate-800"></p>
+      <p id="toast-message" class="text-xs text-slate-500 mt-0.5"></p>
+    </div>
+    <button onclick="hideToast()" class="text-slate-300 hover:text-slate-500 ml-2 flex-shrink-0">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+</div>
+
+<div class="w-full max-w-7xl bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-white/80 shadow-2xl p-5 sm:p-8 lg:p-10 transition-all duration-300">
+<!-- TopNavigation -->
+<header class="flex flex-col lg:flex-row items-center justify-between gap-4 pb-8 mb-8 border-b border-surface-border">
+<div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-card-lift">
+<i class="fa-solid fa-graduation-cap text-xl"></i>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-extrabold text-lg tracking-tight text-slate-900">UPB<span class="text-brand-600">.ID</span></span>
+<span class="bg-brand-100 text-brand-800 text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">SSO v4.8</span>
+</div>
+<p class="text-xs text-slate-500 font-medium">Smart SIAKAD &amp; Smart LMS Portal</p>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between lg:justify-end gap-3 w-full lg:w-auto text-xs font-semibold text-slate-600">
+<div class="relative hidden md:block">
+<i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+<input class="pl-9 pr-4 py-2 bg-slate-100/80 hover:bg-slate-100 focus:bg-white rounded-full text-xs border border-transparent focus:border-brand-300 focus:ring-2 focus:ring-brand-200 outline-none w-56 transition-all" placeholder="Cari panduan, helpdesk, kendala..." type="text" id="login-search"/>
+</div>
+<nav aria-label="Bantuan dan Panduan" class="flex items-center gap-2">
+<a class="px-3 py-2 rounded-full hover:bg-slate-100 text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer" onclick="showToast('info', 'Panduan SSO UPB', 'Masukkan NIM Anda sebagai ID Pengguna dan kata sandi akun SIAKAD untuk masuk.')">
+<i class="fa-regular fa-file-lines text-brand-600"></i>
+<span>Panduan SSO</span>
+</a>
+<a class="px-3 py-2 rounded-full hover:bg-slate-100 text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer" onclick="showToast('info', 'Loket BAAK UPB', 'Layanan BAAK aktif Senin - Sabtu: 08:00 - 17:00 WIB (WhatsApp: +62 812-9900-8812)')">
+<i class="fa-solid fa-headset text-brand-600"></i>
+<span>Loket BAAK</span>
+</a>
+</nav>
+<div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-[11px]">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span>Semester Genap 2024/2025</span>
+</div>
+</div>
+</header>
+
+<main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT SECTION -->
+<section aria-labelledby="auth-heading" class="lg:col-span-7 flex flex-col gap-6 animate-fade-in-up">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold mb-3">
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
+</span>
+            Gerbang Masuk Akademik Terpadu
+</div>
+<h1 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-slate-900 tracking-tight leading-tight" id="auth-heading">
+            Selamat Datang di <span class="bg-gradient-to-r from-brand-700 via-indigo-600 to-brand-500 bg-clip-text text-transparent">Portal UPB!</span>
+</h1>
+<p class="text-slate-500 text-sm sm:text-base mt-2 max-w-xl font-normal leading-relaxed">
+            Satu kredensial Single Sign-On (SSO) untuk membuka akses SIAKAD, E-Learning Smart LMS, Jadwal Kuliah, Registrasi UKT, dan Presensi QR Digital.
+</p>
+</div>
+
+<!-- Role Switcher -->
+<div class="flex items-center gap-2 p-1.5 bg-slate-100/90 rounded-2xl w-fit max-w-full overflow-x-auto text-xs font-bold" role="tablist">
+<button aria-selected="true" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm flex items-center gap-2 transition-all" role="tab" data-role="mahasiswa">
+<i class="fa-solid fa-user-graduate"></i>
+<span>Mahasiswa</span>
+</button>
+<button aria-selected="false" class="px-5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 flex items-center gap-2 transition-all" role="tab" data-role="dosen">
+<i class="fa-solid fa-chalkboard-user"></i>
+<span>Dosen &amp; Staff</span>
+</button>
+<button aria-selected="false" class="px-5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/60 flex items-center gap-2 transition-all" role="tab" data-role="wali">
+<i class="fa-solid fa-id-card-clip"></i>
+<span>Wali / Calon Mhs</span>
+</button>
+</div>
+
+<!-- Authentication Form -->
+<div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-soft-clay transition-all animate-fade-in-up-delay">
+<div class="flex items-center justify-between pb-5 mb-5 border-b border-slate-100">
+<div>
+<h2 class="text-lg font-bold text-slate-900">Masuk ke Akun Anda</h2>
+<p class="text-xs text-slate-400 mt-0.5 font-medium" id="login-subtitle">Gunakan NIM atau Email Institusi Pelita Bangsa</p>
+</div>
+<div class="w-10 h-10 rounded-2xl bg-brand-50 border border-brand-100 text-brand-700 flex items-center justify-center">
+<i class="fa-solid fa-shield-halved text-lg"></i>
+</div>
+</div>
+<form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+<div>
+<label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider" for="student_id">
+                NIM / Akun Pelita Bangsa <span class="text-rose-500">*</span>
+</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+<i class="fa-regular fa-id-badge text-base"></i>
+</div>
+<input class="w-full pl-10 pr-4 py-3 rounded-2xl bg-surface-cardMuted text-slate-800 text-sm border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-100 outline-none transition-all duration-200 font-medium placeholder:text-slate-400" id="student_id" name="student_id" placeholder="Contoh: 312210542 atau nama@mhs.pelitabangsa.ac.id" required="" type="text"/>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider" for="password">
+                  Kata Sandi Portal <span class="text-rose-500">*</span>
+</label>
+<a class="text-xs font-semibold text-brand-600 hover:text-brand-800 hover:underline" href="#lupa-password">
+                  Lupa Kata Sandi?
+</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+<i class="fa-solid fa-lock text-base"></i>
+</div>
+<input class="w-full pl-10 pr-12 py-3 rounded-2xl bg-surface-cardMuted text-slate-800 text-sm border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-100 outline-none transition-all duration-200 font-medium placeholder:text-slate-400" id="password" name="password" placeholder="Masukkan kata sandi SSO Anda" required="" type="password"/>
+<button aria-label="Lihat kata sandi" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors" onclick="togglePassword()" type="button">
+<i class="fa-regular fa-eye" id="eye-icon"></i>
+</button>
+</div>
+</div>
+
+<!-- Error Message -->
+<div id="error-message" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+  <i class="fa-solid fa-circle-exclamation"></i>
+  <span id="error-text"></span>
+</div>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+<label class="flex items-center gap-2.5 cursor-pointer select-none">
+<input class="w-4 h-4 rounded-md text-brand-600 border-slate-300 focus:ring-brand-500 focus:ring-offset-0" name="remember_me" type="checkbox"/>
+<span class="text-xs text-slate-600 font-medium">Ingat perangkat ini (30 hari)</span>
+</label>
+<div class="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full self-start sm:self-auto font-medium">
+<i class="fa-solid fa-lock text-[10px]"></i>
+<span>SSL Encrypted 256-Bit</span>
+</div>
+</div>
+
+<div class="pt-2">
+<button id="login-btn" class="w-full py-3.5 px-6 rounded-2xl bg-brand-700 hover:bg-brand-800 active:bg-brand-900 text-white font-bold text-sm shadow-accent-glow hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer" type="submit">
+<span id="login-btn-text">Masuk ke Portal Akademik</span>
+<i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform" id="login-btn-icon"></i>
+<div id="login-spinner" class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+</button>
+</div>
+</form>
+<div class="relative flex py-5 items-center">
+<div class="flex-grow border-t border-slate-200"></div>
+<span class="flex-shrink mx-4 text-xs font-semibold text-slate-400 uppercase tracking-widest">Atau masuk cepat dengan</span>
+<div class="flex-grow border-t border-slate-200"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<button class="w-full py-2.5 px-3.5 rounded-2xl bg-white border border-slate-200 hover:border-brand-300 hover:bg-brand-50/40 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-2.5 shadow-sm" type="button" onclick="showToast('info', 'Google SSO', 'Fitur Google Mail UPB sedang dalam pengembangan.')">
+<svg class="w-4 h-4" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+<span>Google Mail UPB</span>
+</button>
+<button class="w-full py-2.5 px-3.5 rounded-2xl bg-white border border-slate-200 hover:border-brand-300 hover:bg-brand-50/40 text-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-2.5 shadow-sm" type="button" onclick="showToast('info', 'QR Code Login', 'Buka UPB Mobile App untuk scan QR Login.')">
+<i class="fa-solid fa-qrcode text-brand-600 text-sm"></i>
+<span>Scan QR UPB Mobile</span>
+</button>
+</div>
+</div>
+
+<!-- Activation Banner -->
+<div class="rounded-2xl bg-brand-50/70 border border-brand-200/60 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-brand-900 animate-fade-in-up-delay2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-xl bg-brand-200 text-brand-800 flex items-center justify-center flex-shrink-0">
+<i class="fa-solid fa-bullhorn text-xs"></i>
+</div>
+<div>
+<p class="font-bold">Mahasiswa Baru atau Belum Memiliki Akun?</p>
+<p class="text-slate-600 font-normal">Aktivasi akun perdana dapat dilakukan langsung secara mandiri melalui BAAK.</p>
+</div>
+</div>
+<a class="px-4 py-2 bg-white text-brand-700 hover:bg-brand-100 rounded-xl font-bold border border-brand-200 shadow-sm transition-all whitespace-nowrap self-stretch sm:self-auto text-center" href="#aktivasi" onclick="showToast('info','Aktivasi Akun','Silakan kunjungi loket BAAK atau hubungi helpdesk.')">
+            Aktivasi Akun Baru
+</a>
+</div>
+</section>
+
+<!-- RIGHT SECTION -->
+<section aria-label="Informasi dan Pengumuman Kampus" class="lg:col-span-5 flex flex-col gap-5 animate-fade-in-up-delay">
+<article class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-soft-clay transition-all hover:shadow-card-lift">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-xl shadow-sm">
+<i class="fa-solid fa-mobile-screen-button"></i>
+</div>
+<div>
+<span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase tracking-wider mb-0.5">Versi Terbaru v4.8</span>
+<h3 class="font-bold text-slate-900 text-sm">Smart LMS &amp; Presensi QR 3.2</h3>
+</div>
+</div>
+<span class="text-slate-300 text-sm"><i class="fa-solid fa-sparkles text-brand-500"></i></span>
+</div>
+<p class="text-xs text-slate-500 font-normal mt-3 leading-relaxed">
+            Presensi perkuliahan kini menggunakan validasi <span class="font-semibold text-slate-700">Geofencing Real-Time</span> di lingkungan kampus Universitas Pelita Bangsa Cikarang.
+</p>
+<div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-100 text-[11px] font-semibold text-slate-600">
+<span class="px-2.5 py-1 bg-slate-100 rounded-lg flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-indigo-600"></i><span>Validasi Lokasi Kampus</span></span>
+<span class="px-2.5 py-1 bg-slate-100 rounded-lg flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-500"></i><span>Sinkron Nilai BAAK</span></span>
+<span class="px-2.5 py-1 bg-slate-100 rounded-lg flex items-center gap-1.5"><i class="fa-solid fa-cloud text-sky-500"></i><span>Cloud Storage 100GB</span></span>
+</div>
+</article>
+
+<article class="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-soft-clay">
+<div class="flex items-center justify-between pb-3 border-b border-slate-100">
+<div class="flex items-center gap-2">
+<i class="fa-regular fa-calendar-check text-brand-600"></i>
+<h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Kalender Akademik Aktif</h3>
+</div>
+<span class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full">Februari 2025</span>
+</div>
+<div class="mt-4 space-y-2.5">
+<div class="p-3 bg-brand-50/70 border border-brand-200/80 rounded-2xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex flex-col items-center justify-center text-[10px] font-bold leading-tight">
+<span>10</span>
+<span class="text-[9px] font-light">FEB</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-800 text-xs">Periode KRS Online Mahasiswa</h4>
+<p class="text-[11px] text-slate-500">Batas akhir revisi: 25 Februari 2025</p>
+</div>
+</div>
+<span class="px-2 py-0.5 bg-brand-700 text-white text-[10px] font-bold rounded-full">Berjalan</span>
+</div>
+<div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-700 flex flex-col items-center justify-center text-[10px] font-bold leading-tight">
+<span>03</span>
+<span class="text-[9px] font-light">MAR</span>
+</div>
+<div>
+<h4 class="font-semibold text-slate-800 text-xs">Awal Perkuliahan Semester Genap</h4>
+<p class="text-[11px] text-slate-400">Tatap Muka &amp; LMS E-Learning</p>
+</div>
+</div>
+<span class="text-[11px] font-semibold text-slate-400">Segera</span>
+</div>
+</div>
+<div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+<span class="text-slate-500 font-medium">Status Server SIAKAD:</span>
+<div class="flex items-center gap-1.5 text-emerald-600 font-bold">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span id="server-status">100% Online (42ms)</span>
+</div>
+</div>
+</article>
+
+<article class="bg-gradient-to-br from-indigo-900 via-brand-800 to-purple-900 text-white rounded-3xl p-6 shadow-card-lift relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-start">
+<div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white mb-3 text-lg">
+<i class="fa-solid fa-shield-virus"></i>
+</div>
+<h3 class="text-base font-extrabold tracking-tight">Perlindungan Akun 2FA Aktif</h3>
+<p class="text-indigo-200 text-xs font-normal mt-1 leading-relaxed">
+              Jaga kerahasiaan Kartu Rencana Studi dan Nilai Akademik Anda. Aktifkan verifikasi WhatsApp OTP.
+</p>
+<a class="mt-4 px-4 py-2 bg-white text-brand-900 hover:bg-brand-50 rounded-xl font-bold text-xs shadow-md transition-all inline-flex items-center gap-1.5 cursor-pointer" onclick="showToast('info', 'Keamanan SSO', 'Aktifkan 2FA melalui menu Pengaturan Profil di portal SIAKAD UPB.')">
+<span>Panduan Keamanan SSO</span>
+<i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+</a>
+</div>
+</article>
+
+<article class="bg-surface-cardMuted rounded-3xl border border-slate-200 p-4 text-xs">
+<div class="flex items-center justify-between mb-2">
+<span class="font-bold text-slate-800 flex items-center gap-1.5">
+<i class="fa-solid fa-building-columns text-brand-600"></i>
+              Biro Akademik &amp; Sistem Informasi (BAAK / PUSDATIN)
+</span>
+</div>
+<p class="text-slate-500 text-[11px] leading-relaxed">
+            Kampus Utama UPB: Jl. Inspeksi Kalimalang No.9, Cibatu, Cikarang Pusat, Kab. Bekasi, Jawa Barat.
+</p>
+<div class="mt-2.5 pt-2.5 border-t border-slate-200/80 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-slate-700">
+<a class="hover:text-brand-600 flex items-center gap-1" href="https://wa.me/6281299008812">
+<i class="fa-brands fa-whatsapp text-emerald-600"></i> +62 812-9900-8812
+</a>
+<a class="hover:text-brand-600 flex items-center gap-1" href="mailto:helpdesk@pelitabangsa.ac.id">
+<i class="fa-regular fa-envelope text-brand-600"></i> helpdesk@pelitabangsa.ac.id
+</a>
+</div>
+</article>
+</section>
+</main>
+
+<footer class="mt-10 pt-6 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-medium">
+<div>
+        © 2025 <span class="font-semibold text-slate-600">Universitas Pelita Bangsa</span>. Hak Cipta Dilindungi Undang-Undang.
+</div>
+<div class="flex items-center gap-4">
+<a class="hover:text-slate-700 transition-colors cursor-pointer" onclick="showToast('info', 'Kebijakan Privasi', 'Data privasi mahasiswa dilindungi sesuai regulasi PDDIKTI Kemendikbudristek.')">Kebijakan Privasi</a>
+<span class="text-slate-300">•</span>
+<a class="hover:text-slate-700 transition-colors cursor-pointer" onclick="showToast('info', 'Ketentuan Layanan', 'Akses portal ini hanya untuk civitas akademika Universitas Pelita Bangsa.')">Ketentuan Layanan SSO</a>
+<span class="text-slate-300">•</span>
+<a class="hover:text-slate-700 transition-colors cursor-pointer" onclick="showToast('info', 'FAQ Akademik', 'Pertanyaan seputar KRS, jadwal kuliah & pembayaran dapat dilihat di helpdesk UPB.')">FAQ Akademik</a>
+</div>
+</footer>
+</div>
+
+<script src="js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tugas &amp; E-Learning LMS - Universitas Pelita Bangsa</title>
+<!-- Tailwind CSS v3 CDN with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              dock: '#4f46e5',
+              dark: '#111827',
+            },
+            surface: {
+              canvas: '#f1f2fa',
+              card: '#ffffff',
+              muted: '#f8f9fd',
+            }
+          },
+          borderRadius: {
+            '3xl': '1.5rem',
+            '4xl': '2rem',
+            '5xl': '2.5rem',
+          },
+          boxShadow: {
+            'soft': '0 10px 35px -5px rgba(99, 102, 241, 0.07), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+            'float': '0 20px 40px -10px rgba(79, 70, 229, 0.16)',
+            'pill': '0 4px 14px rgba(79, 70, 229, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+<link rel="stylesheet" href="css/main.css"/>
+</head>
+<body class="m-0 p-0 text-slate-800 bg-[#f8f9fe] antialiased selection:bg-indigo-500 selection:text-white h-screen w-full overflow-hidden flex">
+<!-- BEGIN: Master Application Shell Bento Container -->
+<main class="w-full h-screen flex flex-row bg-white relative overflow-hidden">
+<!-- Sidebar injected by shared.js -->
+<div id="sidebar-container" class="h-full shrink-0 flex"></div>
+
+<!-- BEGIN: Main Canvas Content -->
+<div class="flex-1 flex flex-col h-full px-4 sm:px-6 lg:px-10 py-7 overflow-y-auto custom-scroll pb-7">
+<!-- BEGIN: Top Navigation & Command Bar -->
+<header class="flex items-center justify-between gap-3 pb-4 border-b border-slate-100 shrink-0" data-purpose="top-navigation">
+<!-- Breadcrumb Tabs -->
+<nav id="header-tabs" class="flex items-center"></nav>
+<!-- Right Command Strip -->
+<div class="flex items-center gap-2 sm:gap-3 shrink-0">
+<!-- Search Pill -->
+<div class="relative hidden sm:block">
+<svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<input class="w-40 lg:w-56 pl-9 pr-4 py-2 text-xs rounded-full bg-slate-100/90 border-0 focus:ring-2 focus:ring-indigo-500 text-slate-700 placeholder-slate-400 font-medium" placeholder="Cari modul, tugas..." type="text" id="global-search"/>
+</div>
+<!-- Utility Notifications -->
+<button onclick="showGlobalToast('info','Notifikasi','Tidak ada tugas baru yang terlambat.')" class="w-8 h-8 rounded-full bg-slate-50 text-slate-500 hover:text-indigo-600 flex items-center justify-center border border-slate-200 shrink-0 relative">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="w-2 h-2 rounded-full bg-rose-400 absolute top-1.5 right-1.5 animate-pulse"></span>
+</button>
+<!-- Sinkronisasi SIAKAD Button -->
+<button onclick="showGlobalToast('success','Sinkronisasi','Data tugas SIAKAD UPB berhasil disinkronkan!')" class="hidden sm:inline-flex bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-semibold items-center space-x-1.5 transition shrink-0">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Sinkron SIAKAD</span>
+</button>
+<!-- + Buat Catatan Tugas -->
+<button class="bg-slate-900 hover:bg-black text-white px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold shadow flex items-center space-x-1.5 transition shrink-0" onclick="openUploadModal('Catatan Tugas Baru', 'Teknik Informatika')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="hidden sm:inline">+ Buat Catatan Tugas</span>
+<span class="sm:hidden">+ Catatan</span>
+</button>
+</div>
+</header>
+<!-- END: Top Navigation & Command Bar -->
+<!-- BEGIN: Hero Greeting & Quick Action Bento Cards Row -->
+<section class="mt-6 mb-7" data-purpose="hero-and-top-row">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+<!-- Left Hero Title & Subtitle (Span 4) -->
+<div class="lg:col-span-4 flex flex-col justify-center pr-2">
+<div class="flex items-center space-x-2">
+<h1 class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Manajemen Tugas &amp; LMS
+            </h1>
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200/80 shadow-xs"><span class="material-symbols-outlined text-[18px]">assignment</span></span>
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-violet-50 text-violet-600 border border-violet-200/80 shadow-xs"><span class="material-symbols-outlined text-[18px]">auto_awesome</span></span>
+</div>
+<p class="text-xs lg:text-sm text-slate-400 mt-2.5 font-normal leading-relaxed max-w-sm">
+            Pantau progres penugasan akademik, tenggat waktu pengumpulan proyek laboratorium, serta evaluasi hasil penilaian dosen secara real-time.
+          </p>
+</div>
+<!-- Quick Card 0: + Tugas Mandiri (Dashed Bento Card) (Span 2) -->
+<div class="lg:col-span-2 bg-[#f8f9fe] border-2 border-dashed border-indigo-200/80 rounded-[1.75rem] p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50/50 transition group" onclick="openUploadModal('Tugas Mandiri Tambahan', 'Pemrograman Web Lanjut')">
+<div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+</div>
+<span class="text-xs font-bold text-slate-700 mt-2.5">+ Tugas Mandiri</span>
+<span class="text-[10px] text-slate-400">Jadwal &amp; Catatan Baru</span>
+</div>
+<!-- Quick Card 1: Modul & E-Book (Span 2) -->
+<div class="lg:col-span-2 bg-white rounded-[1.75rem] p-4 shadow-soft border border-slate-100/90 flex flex-col items-center text-center justify-between hover:shadow-lg transition cursor-pointer" onclick="showGlobalToast('info', 'Modul & E-Book LMS', 'Membuka repositori berkas modul perkuliahan semester berjalan...')">
+<div class="w-20 h-20 bg-indigo-50/80 rounded-2xl flex items-center justify-center relative p-2 overflow-hidden">
+<div class="w-14 h-14 bg-white border border-indigo-200 rounded-lg shadow-sm p-1.5 flex flex-col justify-between">
+<div class="flex space-x-1 items-center border-b border-indigo-100 pb-1">
+<span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+<div class="w-6 h-1 bg-indigo-200 rounded"></div>
+</div>
+<div class="space-y-1">
+<div class="w-full h-1 bg-indigo-100 rounded"></div>
+<div class="w-3/4 h-1 bg-indigo-100 rounded"></div>
+</div>
+<div class="text-[8px] font-bold text-indigo-700 text-right">PDF</div>
+</div>
+</div>
+<div class="mt-2">
+<h3 class="text-xs font-bold text-slate-800">Modul &amp; E-Book</h3>
+<p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Unduh materi kuliah</p>
+</div>
+</div>
+<!-- Quick Card 2: Forum Diskusi (Span 2) -->
+<div class="lg:col-span-2 bg-white rounded-[1.75rem] p-4 shadow-soft border border-slate-100/90 flex flex-col items-center text-center justify-between hover:shadow-lg transition cursor-pointer" onclick="showGlobalToast('info', 'Forum Diskusi LMS', 'Membuka ruang diskusi komunal mahasiswa TI.22.A4...')">
+<div class="w-20 h-20 bg-purple-50/70 rounded-2xl flex items-center justify-center relative p-2">
+<div class="w-14 h-12 bg-white border border-purple-200 rounded-lg shadow-sm flex flex-col items-center justify-center">
+<span class="text-[10px] font-bold text-purple-700 flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[14px]">forum</span>Tanya Lab</span>
+<span class="text-[8px] text-purple-400">Teknik Informatika</span>
+</div>
+</div>
+<div class="mt-2">
+<h3 class="text-xs font-bold text-slate-800">Forum Diskusi</h3>
+<p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Diskusi rekan sekelas</p>
+</div>
+</div>
+<!-- Quick Card 3: Arsip Nilai (Span 2) -->
+<div class="lg:col-span-2 bg-white rounded-[1.75rem] p-4 shadow-soft border border-slate-100/90 flex flex-col items-center text-center justify-between hover:shadow-lg transition cursor-pointer" onclick="showGlobalToast('success', 'Arsip Nilai Tugas', 'Rata-rata nilai tugas terverifikasi: 94.2 (Kategori A)')">
+<div class="w-20 h-20 bg-emerald-50/70 rounded-2xl flex items-center justify-center relative p-2">
+<div class="relative w-12 h-14">
+<div class="absolute -left-1 top-1 w-10 h-12 bg-white border border-emerald-300 rounded shadow-xs rotate-[-10deg]"></div>
+<div class="absolute right-0 top-0 w-10 h-12 bg-white border border-emerald-500 rounded shadow-sm flex flex-col justify-center items-center">
+<span class="text-[10px] font-extrabold text-emerald-600">A</span>
+<span class="text-[7px] text-slate-400">94.2</span>
+</div>
+</div>
+</div>
+<div class="mt-2">
+<h3 class="text-xs font-bold text-slate-800">Arsip Nilai</h3>
+<p class="text-[11px] text-slate-400 mt-0.5 leading-snug">8 Tugas tervalidasi</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Hero Greeting & Quick Action Bento Cards Row -->
+<!-- BEGIN: Bento Grid Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Task Feed & Filter Tabs (Span 8) -->
+<div class="lg:col-span-8 flex flex-col gap-5">
+<!-- Filter Tabs Bar -->
+<div class="bg-white rounded-2xl p-2 shadow-soft border border-slate-100 flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 overflow-x-auto" id="taskTabList">
+<button class="px-3.5 py-1.5 rounded-xl font-semibold text-xs bg-indigo-600 text-white shadow-sm transition whitespace-nowrap" onclick="filterTasks('all', this)">
+              Semua Tugas <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-white/20 text-white">10</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-xl font-semibold text-xs text-slate-500 hover:bg-slate-100 transition whitespace-nowrap" onclick="filterTasks('urgent', this)">
+              Perlu Dikerjakan <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-600 font-bold">2</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-xl font-semibold text-xs text-slate-500 hover:bg-slate-100 transition whitespace-nowrap" onclick="filterTasks('review', this)">
+              Sedang Dinilai
+            </button>
+<button class="px-3.5 py-1.5 rounded-xl font-semibold text-xs text-slate-500 hover:bg-slate-100 transition whitespace-nowrap" onclick="filterTasks('completed', this)">
+              Riwayat Selesai <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-700">8</span>
+</button>
+</div>
+<div class="relative w-48 hidden sm:block">
+<svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input class="w-full bg-slate-50 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 border border-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Filter tugas..." type="text"/>
+</div>
+</div>
+<!-- Task 1: Mendesak (Laravel REST API) -->
+<article class="task-card bg-white rounded-3xl p-6 shadow-soft border border-slate-100 flex flex-col gap-4 relative overflow-hidden transition hover:shadow-lg" data-category="urgent">
+<!-- Top Tag Bar -->
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center space-x-2">
+<span class="text-indigo-600 bg-indigo-50 text-[11px] font-bold px-2.5 py-1 rounded-full">TI-22-C1</span>
+<span class="text-slate-500 bg-slate-100 text-[11px] font-semibold px-2.5 py-1 rounded-full">Praktikum Lab Web</span>
+<span class="bg-rose-100 text-rose-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping"></span>
+                MENDESAK • Sisa 12 Jam
+              </span>
+</div>
+<span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">Bobot: 15%</span>
+</div>
+<!-- Main Info -->
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div>
+<h2 class="text-base sm:text-lg font-extrabold text-slate-900 hover:text-indigo-600 transition cursor-pointer">
+                Tugas 04 - Implementasi REST API &amp; JWT Authentication Laravel 11
+              </h2>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-xs mt-1.5">
+<span class="font-medium text-slate-600 flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Pemrograman Berbasis Web Lanjut
+                </span>
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Dr. Ir. Hendra Saputra, M.Kom.
+                </span>
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Pertemuan Ke-7
+                </span>
+</div>
+</div>
+<!-- Lecturer Avatar Pill -->
+<div class="flex items-center space-x-1.5 bg-slate-50 px-2.5 py-1 rounded-xl shrink-0 self-start">
+<span class="text-[11px] font-semibold text-slate-600">Pak Hendra</span>
+<div class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-[10px] flex items-center justify-center">HS</div>
+</div>
+</div>
+<!-- Requirements Checklist Box -->
+<div class="bg-slate-50/90 rounded-2xl p-4 border border-slate-100 flex flex-col gap-1.5 text-xs text-slate-600">
+<span class="font-bold text-slate-800 text-[11px] uppercase tracking-wide">Persyaratan Pengumpulan:</span>
+<ul class="space-y-1 pl-1">
+<li class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0"></span>
+                Format arsip kode: <strong class="text-slate-800">ZIP / GitHub Repo Public</strong> dengan migration &amp; seed data.
+              </li>
+<li class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0"></span>
+                Dokumentasi PDF runner endpoint API menggunakan <strong class="text-slate-800">Postman Collection</strong> (min. 6 endpoint).
+              </li>
+<li class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0"></span>
+                Gunakan JWT secret key terenkripsi dan sertakan <code class="px-1 py-0.5 bg-slate-200/80 rounded font-mono text-[10px]">.env.example</code>.
+              </li>
+</ul>
+</div>
+<!-- Footer Actions -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+<a class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Unduh Modul &amp; Skema Database (PDF)</span>
+</a>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow transition" onclick="openUploadModal('Tugas 04 - Implementasi REST API &amp; JWT Authentication Laravel 11', 'Pemrograman Berbasis Web Lanjut')">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>+ Unggah Berkas Tugas (LMS)</span>
+</button>
+</div>
+</article>
+<!-- Task 2: Makalah Paper Review CNN -->
+<article class="task-card bg-white rounded-3xl p-6 shadow-soft border border-slate-100 flex flex-col gap-4 relative overflow-hidden transition hover:shadow-lg" data-category="urgent">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center space-x-2">
+<span class="text-indigo-600 bg-indigo-50 text-[11px] font-bold px-2.5 py-1 rounded-full">TI-22-C1</span>
+<span class="text-slate-500 bg-slate-100 text-[11px] font-semibold px-2.5 py-1 rounded-full">Studi Literatur</span>
+<span class="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                Sisa 3 Hari (Jumat, 17:00 WIB)
+              </span>
+</div>
+<span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">Bobot: 20%</span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div>
+<h2 class="text-base sm:text-lg font-extrabold text-slate-900 hover:text-indigo-600 transition cursor-pointer">
+                Makalah &amp; Paper Review: Arsitektur Convolutional Neural Network (CNN)
+              </h2>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-xs mt-1.5">
+<span class="font-medium text-slate-600 flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Kecerdasan Buatan &amp; Sistem Pakar
+                </span>
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Prof. Maya Anggraini, Ph.D.
+                </span>
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  Kelompok (3 Mahasiswa)
+                </span>
+</div>
+</div>
+<div class="flex items-center space-x-1.5 bg-slate-50 px-2.5 py-1 rounded-xl shrink-0 self-start">
+<span class="text-[11px] font-semibold text-slate-600">Prof. Maya</span>
+<div class="w-6 h-6 rounded-full bg-violet-600 text-white font-bold text-[10px] flex items-center justify-center">MA</div>
+</div>
+</div>
+<p class="text-xs text-slate-500 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100 leading-relaxed">
+            Pilihlah salah satu paper bereputasi (IEEE / ScienceDirect) terbitan 2022-2024 terkait penerapan arsitektur ResNet atau MobileNet dalam Computer Vision. Tulis resume analitis dengan template IEEE minimal 6 halaman.
+          </p>
+<div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+<span class="text-xs text-slate-400 flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Status: Draf belum diunggah
+            </span>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition" onclick="openUploadModal('Makalah &amp; Paper Review: Arsitektur Convolutional Neural Network (CNN)', 'Kecerdasan Buatan')">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Buka Petunjuk &amp; Upload</span>
+</button>
+</div>
+</article>
+<!-- Task 3: Selesai Dinilai (Mini Project Basis Data) -->
+<article class="task-card bg-white rounded-3xl p-6 shadow-soft border border-slate-100 flex flex-col gap-4 relative overflow-hidden transition hover:shadow-lg" data-category="completed">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center space-x-2">
+<span class="bg-emerald-50 text-emerald-700 font-bold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                Selesai Dinilai • 14 Okt 2024
+              </span>
+<span class="text-slate-500 bg-slate-100 text-[11px] font-semibold px-2.5 py-1 rounded-full">Proyek Basis Data</span>
+</div>
+<!-- Score Badge -->
+<div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-2xl border border-emerald-100">
+<div class="text-right">
+<span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wider block">Nilai Akhir</span>
+<span class="text-base font-extrabold text-emerald-700 leading-none">96<span class="text-xs text-slate-400 font-normal">/100</span></span>
+</div>
+<span class="text-lg">⭐</span>
+</div>
+</div>
+<div>
+<h2 class="text-base font-extrabold text-slate-900">
+              Mini Project: Normalisasi Basis Data &amp; ERD Rumah Sakit
+            </h2>
+<div class="flex items-center gap-3 text-slate-400 text-xs mt-1">
+<span class="font-medium text-slate-600">Sistem Basis Data Terdistribusi</span>
+<span>•</span>
+<span>Dosen: Ahmad Fauzi, S.Kom., M.T.</span>
+</div>
+</div>
+<!-- Lecturer Feedback Note -->
+<div class="bg-indigo-50/60 rounded-2xl p-4 border border-indigo-100/70 flex flex-col gap-1 text-xs">
+<span class="font-bold text-indigo-900 flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Ulasan &amp; Catatan Dosen:
+            </span>
+<p class="text-slate-600 italic">
+              "Relasi database sangat baik dan dokumentasi query lengkap. Penerapan bentuk 3NF hingga BCNF sangat terstruktur. Pertahankan kualitas analisis seperti ini!"
+            </p>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs text-slate-500">
+<div class="flex items-center gap-1.5">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Berkas Anda: <span class="font-semibold text-slate-700">ERD_RS_ArniYuniarni_Final.pdf</span> (4.2 MB)</span>
+</div>
+<button class="font-semibold text-indigo-600 hover:text-indigo-800 transition">
+              Lihat Detail Pengumpulan →
+            </button>
+</div>
+</article>
+<!-- Task 4: Selesai Dinilai (Laporan Praktikum Socket) -->
+<article class="task-card bg-white rounded-3xl p-6 shadow-soft border border-slate-100 flex flex-col gap-4 relative overflow-hidden transition hover:shadow-lg" data-category="completed">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center space-x-2">
+<span class="bg-emerald-50 text-emerald-700 font-bold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+                Selesai Dinilai • 02 Okt 2024
+              </span>
+<span class="text-slate-500 bg-slate-100 text-[11px] font-semibold px-2.5 py-1 rounded-full">Praktikum Jaringan</span>
+</div>
+<div class="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-2xl border border-emerald-100">
+<div class="text-right">
+<span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wider block">Nilai Akhir</span>
+<span class="text-base font-extrabold text-emerald-700 leading-none">92<span class="text-xs text-slate-400 font-normal">/100</span></span>
+</div>
+<span class="text-emerald-600 flex items-center justify-center"><span class="material-symbols-outlined text-[20px]">military_tech</span></span>
+</div>
+</div>
+<div>
+<h2 class="text-base font-extrabold text-slate-900">
+              Laporan Praktikum 03: Socket Programming Client-Server
+            </h2>
+<div class="flex items-center gap-3 text-slate-400 text-xs mt-1">
+<span class="font-medium text-slate-600">Komunikasi Data &amp; Jaringan Komputer</span>
+<span>•</span>
+<span>Dosen: Bambang Wicaksono, M.Kom.</span>
+</div>
+</div>
+<div class="bg-indigo-50/60 rounded-2xl p-4 border border-indigo-100/70 flex flex-col gap-1 text-xs">
+<span class="font-bold text-indigo-900 flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Ulasan &amp; Catatan Dosen:
+            </span>
+<p class="text-slate-600 italic">
+              "Implementasi multithreading server berjalan mulus pada test case payload concurrency tinggi. Perlu penambahan handling timeout connection pada client."
+            </p>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs text-slate-500">
+<div class="flex items-center gap-1.5">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Berkas Anda: <span class="font-semibold text-slate-700">Lab03_Socket_ArniYuniarni.zip</span> (12.8 MB)</span>
+</div>
+<button class="font-semibold text-indigo-600 hover:text-indigo-800 transition">
+              Lihat Detail Pengumpulan →
+            </button>
+</div>
+</article>
+</div>
+<!-- RIGHT COLUMN: Radial Gauge, Maintenance Notice, Forum Stream (Span 4) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Radial Gauge & Evaluation Card -->
+<article class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex flex-col items-center text-center">
+<div class="flex items-center justify-between w-full mb-3">
+<h3 class="text-sm font-bold text-slate-800">Evaluasi Rata-rata Nilai</h3>
+<span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">Semester Ganjil</span>
+</div>
+        <div class="relative w-28 h-28 my-1 flex items-center justify-center">
+          <svg class="w-28 h-28" viewBox="0 0 112 112" width="112" height="112">
+            <circle cx="56" cy="56" fill="none" r="46" stroke="#f1f5f9" stroke-width="9"></circle>
+            <circle class="gauge-circle" cx="56" cy="56" fill="none" r="46" stroke="#4f46e5" stroke-dasharray="289" stroke-dashoffset="17" stroke-linecap="round" stroke-width="9"></circle>
+          </svg>
+          <div class="absolute flex flex-col items-center pointer-events-none">
+<span class="text-2xl font-black text-slate-900 leading-none">94.2</span>
+<span class="text-[10px] font-semibold text-slate-400 mt-0.5">/ 100 (A)</span>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wide mt-2">Performa Sangat Memuaskan</span>
+<p class="text-xs text-slate-500 mt-1 leading-snug px-3">
+            Meningkat <strong class="text-slate-800">+3.4 poin</strong> dibanding semester sebelumnya. 8 tugas terkirim tepat waktu 100%.
+          </p>
+<div class="w-full grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 text-left">
+<div class="bg-slate-50 p-2.5 rounded-xl">
+<span class="text-[10px] text-slate-400 block font-semibold">Tugas Selesai</span>
+<span class="text-xs font-bold text-slate-800">8 Penugasan</span>
+</div>
+<div class="bg-slate-50 p-2.5 rounded-xl">
+<span class="text-[10px] text-slate-400 block font-semibold">Kategori Mutu</span>
+<span class="text-xs font-bold text-indigo-600">Predikat A</span>
+</div>
+</div>
+</article>
+<!-- Campus Visual / Maintenance Notice Card (Adapted from Reference Gradient Bento) -->
+<article class="bg-gradient-to-b from-[#4f46e5] to-[#4338ca] text-white rounded-[2rem] p-5 shadow-float flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="bg-emerald-400/20 text-emerald-300 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider border border-emerald-400/30">
+              Pemberitahuan Lab
+            </span>
+</div>
+<div class="mt-2">
+<h3 class="text-base font-extrabold text-white tracking-tight">Maintenance Server LMS</h3>
+<p class="text-xs text-indigo-100/90 mt-1 leading-relaxed">
+              Upgrade bandwidth &amp; container SIAKAD dijadwalkan Minggu, 27 Okt pukul 01:00 - 04:00 WIB. Pastikan submit tugas sebelum jadwal tersebut.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-indigo-200">
+<span>UPB Cloud Infrastructure</span>
+<span class="font-bold text-white">v3.4.2</span>
+</div>
+</article>
+<!-- Academic Forum / Community Stream Bento -->
+<article class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<h3 class="text-sm font-bold text-slate-800">Forum Diskusi Terkini</h3>
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+</div>
+<a class="text-[11px] font-bold text-indigo-600 hover:underline" href="#">Semua</a>
+</div>
+<div class="flex flex-col gap-2.5 divide-y divide-slate-100">
+<!-- Discussion Item 1 -->
+<div class="pt-2 flex flex-col gap-1 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-slate-800 truncate max-w-[180px]">Tanya Syntax JWT Auth Laravel</span>
+<span class="text-[10px] text-slate-400">15m lalu</span>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                Apakah token blacklist di Redis wajib diimplementasikan untuk tugas ke-4 ini Pak Hendra?
+              </p>
+<div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-slate-400">chat_bubble_outline</span>7 Balasan</span>
+<span>•</span>
+<span class="font-medium text-indigo-600">Kevin Pratama (TI-21-A)</span>
+</div>
+</div>
+<!-- Discussion Item 2 -->
+<div class="pt-2 flex flex-col gap-1 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-slate-800 truncate max-w-[180px]">Dataset Review Paper CNN</span>
+<span class="text-[10px] text-slate-400">2j lalu</span>
+</div>
+<p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                Rekomendasi dataset citra rontgen paru di Kaggle untuk perbandingan akurasi dengan paper IEEE?
+              </p>
+<div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-slate-400">chat_bubble_outline</span>12 Balasan</span>
+<span>•</span>
+<span class="font-medium text-violet-600">Siti Rahmawati</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-1 py-2 px-3 bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Buka Forum Mata Kuliah</span>
+</button>
+</article>
+</div>
+</div>
+<!-- END: Bento Grid Content Area -->
+</div>
+<!-- END: Main Canvas Content -->
+</main>
+<!-- END: Master Application Shell Bento Container -->
+<!-- BEGIN: Interactive Upload Modal (Clean Rounded Bento Styling) -->
+<div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4" id="uploadModal">
+<div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+<!-- Modal Header -->
+<div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-800" id="modalTaskTitle">Unggah Berkas Tugas</h3>
+<p class="text-[11px] text-slate-400" id="modalCourseTitle">Pemrograman Berbasis Web Lanjut</p>
+</div>
+</div>
+<button class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-800 transition" onclick="closeUploadModal()" type="button">
+        ✕
+      </button>
+</div>
+<!-- Modal Form -->
+<form class="p-6 flex flex-col gap-4" id="submissionForm" onsubmit="handleFormSubmit(event)">
+<!-- Dropzone -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-700">Berkas Jawaban (.ZIP / .PDF)</label>
+<div class="border-2 border-dashed border-indigo-200/80 hover:border-indigo-500 rounded-2xl p-6 bg-indigo-50/30 hover:bg-indigo-50/60 transition cursor-pointer flex flex-col items-center justify-center text-center group" onclick="document.getElementById('fileInput').click()">
+<input accept=".zip,.pdf,.docx" class="hidden" id="fileInput" onchange="handleFileSelect(this)" type="file"/>
+<div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<p class="text-xs font-bold text-slate-800">Klik untuk memilih berkas atau drag file ke sini</p>
+<p class="text-[10px] text-slate-400 mt-0.5">Format: .ZIP, .PDF, .DOCX (Maksimal 25MB)</p>
+<div class="hidden mt-2 px-3 py-1 bg-indigo-600 text-white text-[11px] font-semibold rounded-lg items-center gap-1.5" id="fileFeedback">
+<span>✓ Berkas terpilih:</span>
+<span id="selectedFileName">file.zip</span>
+</div>
+</div>
+</div>
+<!-- Repo Link -->
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold text-slate-700">Tautan Repository (Opsional)</label>
+<input class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://github.com/username/project-upb" type="url"/>
+</div>
+<!-- Notes -->
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold text-slate-700">Catatan Mahasiswa</label>
+<textarea class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tuliskan kredensial akun uji coba atau catatan tambahan untuk dosen..." rows="2"></textarea>
+</div>
+<!-- Agreement -->
+<div class="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-600">
+<input class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500" id="honestyCheck" required="" type="checkbox"/>
+<label class="cursor-pointer select-none" for="honestyCheck">
+          Saya menyatakan karya ini orisinal tanpa plagiarisme sesuai Kode Etik Akademik Universitas Pelita Bangsa.
+        </label>
+</div>
+<!-- Buttons -->
+<div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+<button class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition" onclick="closeUploadModal()" type="button">
+          Batal
+        </button>
+<button class="px-5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition" id="submitBtn" type="submit">
+          Kirim Berkas Tugas
+        </button>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Interactive Upload Modal -->
+<!-- BEGIN: Toast Notification Alert -->
+<div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3 transform translate-y-32 transition-transform duration-300" id="toastAlert">
+<div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">✓</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Penugasan Berhasil Dikirimkan!</span>
+<span class="text-[10px] text-slate-300">Tersimpan di LMS SIAKAD Universitas Pelita Bangsa.</span>
+</div>
+</div>
+<!-- Shared module -->
+<script src="js/shared.js"></script>
+<script src="js/tugas.js"></script>
+</body></html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tagihan &amp; Pembayaran UKT - UPB Portal Smart LMS</title>
+<!-- Tailwind CSS v3 CDN with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans for ultra-clean modern UI -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              dock: '#4f46e5',
+              dark: '#0f172a',
+            },
+            surface: {
+              canvas: '#f1f2fa',
+              card: '#ffffff',
+              muted: '#f8f9fd',
+            }
+          },
+          borderRadius: {
+            '3xl': '1.5rem',
+            '4xl': '2rem',
+            '5xl': '2.5rem',
+          },
+          boxShadow: {
+            'soft': '0 10px 35px -5px rgba(99, 102, 241, 0.07), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+            'float': '0 20px 40px -10px rgba(79, 70, 229, 0.16)',
+            'pill': '0 4px 14px rgba(79, 70, 229, 0.25)',
+          }
+        }
+      }
+    }
+</script>
+<link rel="stylesheet" href="css/main.css"/>
+</head>
+<body class="m-0 p-0 text-slate-800 bg-[#f8f9fe] antialiased selection:bg-indigo-500 selection:text-white h-screen w-full overflow-hidden flex">
+<!-- BEGIN: Master Application Shell -->
+<main class="w-full h-screen flex flex-row bg-white relative overflow-hidden">
+<!-- Sidebar injected by shared.js -->
+<div id="sidebar-container" class="h-full shrink-0 flex"></div>
+
+<!-- BEGIN: Main Content Area -->
+<div class="flex-1 flex flex-col h-full px-4 sm:px-6 lg:px-9 py-6 overflow-y-auto custom-scroll pb-7">
+<!-- Top Command Strip & Navigation Header -->
+<header class="flex items-center justify-between gap-3 pb-4 border-b border-slate-100 shrink-0" data-purpose="top-navigation">
+<!-- Breadcrumbs & Nav Tabs -->
+<nav id="header-tabs" class="flex items-center"></nav>
+<!-- Right Command Strip: Search, Fast Buttons -->
+<div class="flex items-center gap-2 sm:gap-3 shrink-0">
+<!-- Search Pill -->
+<div class="relative hidden sm:block">
+<svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+</svg>
+<input class="w-40 lg:w-56 pl-9 pr-3.5 py-1.5 text-xs rounded-full bg-slate-100/90 border-0 focus:ring-2 focus:ring-indigo-500 text-slate-700 placeholder-slate-400 font-medium" placeholder="Cari tagihan, VA..." type="text" id="global-search"/>
+</div>
+<!-- Notification Bell -->
+<button onclick="showGlobalToast('info','Notifikasi','Tidak ada tagihan yang jatuh tempo hari ini.')" class="w-8 h-8 rounded-full bg-slate-50 text-slate-500 hover:text-indigo-600 flex items-center justify-center border border-slate-200 shrink-0 relative">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+<span class="w-1.5 h-1.5 bg-rose-500 rounded-full absolute top-1.5 right-1.5"></span>
+</button>
+<!-- Action: Unduh Surat Bebas Tunggakan -->
+<button class="hidden sm:inline-flex bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-semibold items-center space-x-1.5 transition shrink-0" onclick="triggerDownloadModal('Surat Bebas Tunggakan Keuangan (PDF)')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+<span>Bebas Tunggakan</span>
+<span class="bg-indigo-200 text-indigo-900 text-[10px] font-bold px-1.5 rounded">.pdf</span>
+</button>
+<!-- Action: Cetak Kwitansi -->
+<button class="bg-slate-900 hover:bg-black text-white px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold shadow flex items-center space-x-1.5 transition shrink-0" onclick="triggerDownloadModal('E-Kwitansi Pembayaran Resmi UPB')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+<span class="hidden sm:inline">Cetak Kwitansi</span>
+<span class="sm:hidden">Kwitansi</span>
+</button>
+</div>
+</header>
+<!-- BEGIN: Header Greeting & Summary Row -->
+<section class="mt-5 mb-6" data-purpose="hero-title-section">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+<!-- Left Greeting & Title (Span 5) -->
+<div class="lg:col-span-5 flex flex-col justify-center pr-2">
+<div class="flex items-center space-x-2">
+<h1 class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Portal Administrasi Keuangan &amp; UKT
+            </h1>
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200/80 shadow-xs"><span class="material-symbols-outlined text-[18px]">credit_card</span></span>
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-xs"><span class="material-symbols-outlined text-[18px]">auto_awesome</span></span>
+</div>
+<p class="text-xs lg:text-sm text-slate-400 mt-2 font-normal leading-relaxed">
+            Kelola saluran Virtual Account, rincian biaya kuliah semester aktif, dan pantau arsip pelunasan resmi tanpa konfirmasi manual.
+          </p>
+<div class="flex items-center gap-2 mt-3 text-[11px] text-slate-500 font-medium">
+<span class="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              SIAKAD 24/7 Terintegrasi
+            </span>
+<span class="text-slate-300">•</span>
+<span>Mahasiswa: <strong class="text-slate-800">Arni Yuniarni (312210542)</strong></span>
+</div>
+</div>
+<!-- Hero Financial Banner: "Go Premium" Style Card from Reference (Span 7) -->
+<div class="lg:col-span-7 bg-gradient-to-r from-[#4f46e5] via-[#4338ca] to-[#3730a3] text-white rounded-[2rem] p-6 shadow-float relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -right-8 -top-8 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute right-1/3 -bottom-10 w-36 h-36 bg-emerald-400/15 rounded-full blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center p-3 shadow-inner shrink-0 backdrop-blur-sm border border-white/20">
+<svg class="w-8 h-8 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2 mb-1">
+<span class="bg-emerald-400/25 text-emerald-300 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider border border-emerald-400/40">
+                    LUNAS &amp; TERVERIFIKASI - Semester 6
+                  </span>
+<span class="text-indigo-200 text-xs font-medium">TA 2024/2025 Ganjil</span>
+</div>
+<h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">Bebas Tunggakan Finansial</h2>
+<p class="text-xs text-indigo-100/90 mt-1 max-w-lg leading-relaxed">
+                  Status administrasi Anda memenuhi syarat penuh mengikuti <strong>Ujian Tengah Semester (UTS)</strong> dan <strong>Ujian Akhir Semester (UAS)</strong>.
+                </p>
+</div>
+</div>
+<!-- Amount Highlight & Action -->
+<div class="sm:text-right shrink-0 bg-white/10 p-3.5 rounded-2xl border border-white/15 backdrop-blur-sm">
+<span class="text-[10px] uppercase tracking-wider text-indigo-200 font-semibold block">Total Terbayar</span>
+<span class="text-xl sm:text-2xl font-black text-emerald-300 font-mono tracking-tight">Rp 4.780.000</span>
+<span class="text-[10px] text-indigo-200 block mt-0.5 font-mono">TRXZ-UPB-20250115</span>
+</div>
+</div>
+<!-- Bottom Micro Details inside Banner -->
+<div class="relative z-10 pt-4 mt-3 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-100">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Validasi KRS: Disetujui Otomatis</span>
+<span class="hidden sm:inline text-white/30">•</span>
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Kartu Ujian Digital: Terbuka</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="bg-white text-indigo-700 hover:bg-indigo-50 text-xs font-bold px-3 py-1.5 rounded-xl shadow transition" onclick="triggerDownloadModal('Surat Bebas Tunggakan Keuangan (PDF)')">
+                Unduh Surat Bebas
+              </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Header Greeting & Summary Row -->
+<!-- BEGIN: Virtual Account Channel Cards (3 Bank Cards + Guide) -->
+<section class="mb-6" data-purpose="virtual-account-grid">
+<div class="flex items-center justify-between mb-3.5">
+<div class="flex items-center space-x-2">
+<h3 class="text-base font-bold text-slate-800">Saluran Virtual Account UPB</h3>
+<span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">Aktif Permanen</span>
+</div>
+<div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+<span>Otomatis verifikasi 24/7 tanpa slip fisik</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Mandiri VA Card -->
+<div class="bg-white rounded-[1.75rem] p-5 shadow-soft border border-slate-100 flex flex-col justify-between hover:shadow-lg transition">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 font-extrabold text-xs flex items-center justify-center border border-blue-100">
+                BM
+              </div>
+<div>
+<h4 class="text-sm font-extrabold text-slate-800">Mandiri VA</h4>
+<span class="text-[10px] text-slate-400">Bank Mandiri (Persero)</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Kode 88712</span>
+</div>
+<div class="my-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-100">
+<span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Nomor Rekening VA</span>
+<div class="font-mono text-base font-bold text-slate-800 tracking-wider">
+              88712<span class="text-indigo-600">312210542</span>
+</div>
+<span class="text-[10px] text-slate-400 block mt-0.5">a.n. UPB - ARNI YUNIARNI</span>
+</div>
+<button class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl flex items-center justify-center space-x-1.5 transition" onclick="copyVA('88712312210542', this)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+<span>Salin Nomor VA</span>
+</button>
+</div>
+<!-- BRI VA Card -->
+<div class="bg-white rounded-[1.75rem] p-5 shadow-soft border border-slate-100 flex flex-col justify-between hover:shadow-lg transition">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 font-extrabold text-xs flex items-center justify-center border border-sky-100">
+                BRI
+              </div>
+<div>
+<h4 class="text-sm font-extrabold text-slate-800">BRIVA</h4>
+<span class="text-[10px] text-slate-400">Bank Rakyat Indonesia</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Kode 10293</span>
+</div>
+<div class="my-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-100">
+<span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Nomor Rekening VA</span>
+<div class="font-mono text-base font-bold text-slate-800 tracking-wider">
+              10293<span class="text-sky-600">312210542</span>
+</div>
+<span class="text-[10px] text-slate-400 block mt-0.5">a.n. UPB - ARNI YUNIARNI</span>
+</div>
+<button class="w-full py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold rounded-xl flex items-center justify-center space-x-1.5 transition" onclick="copyVA('10293312210542', this)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+<span>Salin Nomor VA</span>
+</button>
+</div>
+<!-- BCA VA Card -->
+<div class="bg-white rounded-[1.75rem] p-5 shadow-soft border border-slate-100 flex flex-col justify-between hover:shadow-lg transition">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 font-extrabold text-xs flex items-center justify-center border border-indigo-100">
+                BCA
+              </div>
+<div>
+<h4 class="text-sm font-extrabold text-slate-800">BCA Virtual Account</h4>
+<span class="text-[10px] text-slate-400">Bank Central Asia</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Kode 00981</span>
+</div>
+<div class="my-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-100">
+<span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Nomor Rekening VA</span>
+<div class="font-mono text-base font-bold text-slate-800 tracking-wider">
+              00981<span class="text-indigo-600">312210542</span>
+</div>
+<span class="text-[10px] text-slate-400 block mt-0.5">a.n. UPB - ARNI YUNIARNI</span>
+</div>
+<button class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl flex items-center justify-center space-x-1.5 transition" onclick="copyVA('00981312210542', this)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+<span>Salin Nomor VA</span>
+</button>
+</div>
+</div>
+</section>
+<!-- END: Virtual Account Channel Cards -->
+<!-- BEGIN: Bento Grid (Rincian Komponen, Petunjuk, Pengumuman & Riwayat) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6" data-purpose="bento-content-grid">
+<!-- LEFT 8 COLS: Rincian Biaya & Petunjuk Pembayaran -->
+<div class="lg:col-span-8 flex flex-col space-y-6">
+<!-- Card: Rincian Komponen Biaya Semester 6 -->
+<article class="bg-white rounded-[2rem] p-5 lg:p-6 border border-slate-100 shadow-soft">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+<div>
+<div class="flex items-center space-x-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+<h3 class="text-base font-bold text-slate-800">Rincian Komponen Biaya Semester 6</h3>
+</div>
+<p class="text-[11px] text-slate-400 mt-0.5">Tahun Ajaran 2024/2025 Ganjil • S1 Teknik Informatika (19 SKS)</p>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs self-start sm:self-auto border border-emerald-200">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>
+              TERLUNASI LENGKAP
+            </span>
+</div>
+<!-- Table of components -->
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-100">
+<th class="py-2.5 px-3">Komponen Beban</th>
+<th class="py-2.5 px-2 text-center">Volume</th>
+<th class="py-2.5 px-3 text-right">Tarif Dasar</th>
+<th class="py-2.5 px-3 text-right">Subtotal</th>
+<th class="py-2.5 px-3 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 font-medium">
+<!-- Item 1 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<div class="font-bold text-slate-800">Biaya Kuliah Pokok (BPP Akademik)</div>
+<div class="text-[10px] text-slate-400">Registrasi operasional akademik semester berjalan</div>
+</td>
+<td class="py-3 px-2 text-center text-slate-600">1 Paket</td>
+<td class="py-3 px-3 text-right font-mono text-slate-600">Rp 1.800.000</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 1.800.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<div class="font-bold text-slate-800">SKS Perkuliahan Teori &amp; Terapan</div>
+<div class="text-[10px] text-slate-400">Beban 19 SKS @ Rp 120.000 per SKS reguler</div>
+</td>
+<td class="py-3 px-2 text-center text-slate-600">19 SKS</td>
+<td class="py-3 px-3 text-right font-mono text-slate-600">Rp 120.000</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 2.280.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+</tr>
+<!-- Item 3 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<div class="font-bold text-slate-800">Praktikum Lab Komputer &amp; Cloud Sandbox</div>
+<div class="text-[10px] text-slate-400">Lisensi Cloud AWS Academy &amp; hardware lab UPB</div>
+</td>
+<td class="py-3 px-2 text-center text-slate-600">1 Paket</td>
+<td class="py-3 px-3 text-right font-mono text-slate-600">Rp 450.000</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 450.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+</tr>
+<!-- Item 4 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<div class="font-bold text-slate-800">Fasilitas Kampus &amp; Perpustakaan Digital</div>
+<div class="text-[10px] text-slate-400">IEEE Xplore, repositori riset UPB &amp; Smart Campus WiFi</div>
+</td>
+<td class="py-3 px-2 text-center text-slate-600">1 Paket</td>
+<td class="py-3 px-3 text-right font-mono text-slate-600">Rp 250.000</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 250.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="bg-indigo-50/50 text-slate-800 font-bold">
+<td class="py-3 px-3 text-right text-xs" colspan="3">Total Tagihan Bersih Semester 6:</td>
+<td class="py-3 px-3 text-right font-mono text-sm text-indigo-700 font-extrabold">Rp 4.780.000</td>
+<td class="py-3 px-3 text-center text-[10px] text-emerald-600 font-extrabold uppercase">Telah Diterima</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</article>
+<!-- Card: Petunjuk Pembayaran Interaktif -->
+<article class="bg-[#fbfbff] rounded-[2rem] p-5 border border-slate-100 shadow-soft">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+<h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+<span class="flex items-center text-amber-500"><span class="material-symbols-outlined text-[18px]">lightbulb</span></span>
+<span>Panduan Cepat Pembayaran Virtual Account</span>
+</h3>
+<!-- Tabs -->
+<div class="bg-slate-100 p-0.5 rounded-xl flex items-center text-xs font-semibold self-start sm:self-auto">
+<button class="px-3 py-1 rounded-lg bg-indigo-600 text-white shadow-sm transition" id="guide-tab-mbanking" onclick="switchGuide('mbanking')" type="button">Mobile Banking</button>
+<button class="px-3 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition" id="guide-tab-atm" onclick="switchGuide('atm')" type="button">Mesin ATM</button>
+<button class="px-3 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition" id="guide-tab-teller" onclick="switchGuide('teller')" type="button">Teller Cabang</button>
+</div>
+</div>
+<!-- Guide content -->
+<div class="text-xs text-slate-600 leading-relaxed pt-1" id="guide-content">
+<ol class="list-decimal pl-4 space-y-1.5 text-[11px] text-slate-500">
+<li>Buka aplikasi Mobile Banking kesayangan Anda (<strong>Livin' by Mandiri, BRImo, atau BCA Mobile</strong>).</li>
+<li>Pilih menu <strong>Bayar / Pembayaran</strong> &gt; Pilih kategori <strong>Pendidikan / Institusi</strong>.</li>
+<li>Pilih penyedia instansi <strong>Universitas Pelita Bangsa (UPB)</strong> atau masukkan kode bank tujuan diikuti NIM.</li>
+<li>Periksa kesesuaian rincian: <strong>UPB - ARNI YUNIARNI (312210542)</strong> dan total nominal tagihan.</li>
+<li>Konfirmasi PIN transaksi. Status di portal ini seketika berubah menjadi <strong>LUNAS</strong> dalam &lt; 30 detik.</li>
+</ol>
+</div>
+</article>
+<!-- Card: Arsip Riwayat Pembayaran Semester 1 - 5 -->
+<article class="bg-white rounded-[2rem] p-5 lg:p-6 border border-slate-100 shadow-soft">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+<div>
+<div class="flex items-center space-x-2">
+<span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+<h3 class="text-base font-bold text-slate-800">Arsip Riwayat Pembayaran (Semester 1 - 5)</h3>
+</div>
+<p class="text-[11px] text-slate-400 mt-0.5">Rekam jejak seluruh transaksi pembayaran uang kuliah terdahulu</p>
+</div>
+<button class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1" onclick="triggerDownloadModal('Seluruh Arsip Kwitansi (ZIP)')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+<span>Ekspor Semua Kwitansi</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-100">
+<th class="py-2.5 px-3">Semester</th>
+<th class="py-2.5 px-3">Tanggal Pelunasan</th>
+<th class="py-2.5 px-3">Kanal Pembayaran</th>
+<th class="py-2.5 px-3 text-right">Nominal</th>
+<th class="py-2.5 px-3 text-center">Status</th>
+<th class="py-2.5 px-2 text-right">E-Receipt</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 font-medium" id="historyTableBody">
+<!-- Semester 5 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<span class="font-bold text-slate-800">Semester 5</span>
+<span class="block text-[10px] text-slate-400">2023/2024 Genap</span>
+</td>
+<td class="py-3 px-3 text-slate-600 font-mono text-[11px]">22 Agu 2024</td>
+<td class="py-3 px-3 text-slate-600">
+<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Mandiri Virtual Account</span>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 4.650.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+<td class="py-3 px-2 text-right">
+<button class="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition" onclick="triggerDownloadModal('Kwitansi Pembayaran Semester 5 (PDF)')" title="Unduh Kwitansi">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+</button>
+</td>
+</tr>
+<!-- Semester 4 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<span class="font-bold text-slate-800">Semester 4</span>
+<span class="block text-[10px] text-slate-400">2023/2024 Ganjil</span>
+</td>
+<td class="py-3 px-3 text-slate-600 font-mono text-[11px]">18 Jan 2024</td>
+<td class="py-3 px-3 text-slate-600">
+<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-sky-600"></span> BRI BRIVA</span>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 4.500.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+<td class="py-3 px-2 text-right">
+<button class="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition" onclick="triggerDownloadModal('Kwitansi Pembayaran Semester 4 (PDF)')" title="Unduh Kwitansi">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+</button>
+</td>
+</tr>
+<!-- Semester 3 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<span class="font-bold text-slate-800">Semester 3</span>
+<span class="block text-[10px] text-slate-400">2022/2023 Genap</span>
+</td>
+<td class="py-3 px-3 text-slate-600 font-mono text-[11px]">25 Agu 2023</td>
+<td class="py-3 px-3 text-slate-600">
+<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Mandiri Virtual Account</span>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 4.500.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+<td class="py-3 px-2 text-right">
+<button class="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition" onclick="triggerDownloadModal('Kwitansi Pembayaran Semester 3 (PDF)')" title="Unduh Kwitansi">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+</button>
+</td>
+</tr>
+<!-- Semester 2 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<span class="font-bold text-slate-800">Semester 2</span>
+<span class="block text-[10px] text-slate-400">2022/2023 Ganjil</span>
+</td>
+<td class="py-3 px-3 text-slate-600 font-mono text-[11px]">16 Jan 2023</td>
+<td class="py-3 px-3 text-slate-600">
+<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span> BCA Virtual Account</span>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 4.400.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+<td class="py-3 px-2 text-right">
+<button class="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition" onclick="triggerDownloadModal('Kwitansi Pembayaran Semester 2 (PDF)')" title="Unduh Kwitansi">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+</button>
+</td>
+</tr>
+<!-- Semester 1 -->
+<tr class="hover:bg-slate-50/60 transition">
+<td class="py-3 px-3">
+<span class="font-bold text-slate-800">Semester 1</span>
+<span class="block text-[10px] text-slate-400">2022/2023 Registrasi Awal</span>
+</td>
+<td class="py-3 px-3 text-slate-600 font-mono text-[11px]">10 Sep 2022</td>
+<td class="py-3 px-3 text-slate-600">
+<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Mandiri Virtual Account</span>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-slate-800">Rp 5.200.000</td>
+<td class="py-3 px-3 text-center">
+<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Lunas</span>
+</td>
+<td class="py-3 px-2 text-right">
+<button class="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 transition" onclick="triggerDownloadModal('Kwitansi Pembayaran Semester 1 (PDF)')" title="Unduh Kwitansi">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</article>
+</div>
+<!-- RIGHT 4 COLS: Info Beasiswa, Kalender Jatuh Tempo, Helpdesk Kampus -->
+<div class="lg:col-span-4 flex flex-col space-y-5">
+<!-- Card: Beasiswa Prestasi IPK Unggul -->
+<article class="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-soft flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold text-violet-700 bg-violet-50 px-2.5 py-0.5 rounded-full border border-violet-100 uppercase tracking-wider">Beasiswa UPB</span>
+<span class="text-[10px] font-mono text-slate-400">01 Mar 2025</span>
+</div>
+<h4 class="text-sm font-extrabold text-slate-800 leading-snug">
+              Program Beasiswa IPK Unggul (≥ 3.75)
+            </h4>
+<p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              Selamat! IPK Anda saat ini tercatat <strong>3.85</strong>. Anda memenuhi syarat potongan BPP sebesar <strong>50%</strong> untuk semester berikutnya.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+<span class="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+              Syarat Terpenuhi
+            </span>
+<button class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1" onclick="alert('Formulir pengajuan beasiswa dibuka tanggal 01 Maret 2025.')">
+<span>Buka Formulir</span>
+<span>→</span>
+</button>
+</div>
+</article>
+<!-- Card: Pengumuman Pengajuan Cicilan UKT -->
+<article class="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-soft">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] font-bold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100 uppercase tracking-wider">Skema Cicilan</span>
+<span class="text-[10px] font-mono text-slate-400">15 - 28 Feb 2025</span>
+</div>
+<h4 class="text-xs font-bold text-slate-800 leading-snug">
+            Jadwal Pengajuan Cicilan UKT Semester Genap
+          </h4>
+<p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+            Bagi mahasiswa yang memerlukan skema cicilan 3 tahap, permohonan daring dibuka via portal BAAK mulai pertengahan Februari.
+          </p>
+<a class="mt-3 text-[11px] font-bold text-slate-700 hover:text-indigo-600 flex items-center gap-1 inline-flex" href="#">
+<span>Unduh Formulir Cicilan</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+</a>
+</article>
+<!-- Card: Helpdesk Keuangan Kampus UPB -->
+<article class="bg-white rounded-[2rem] p-5 border border-slate-100 shadow-soft flex flex-col justify-between">
+<div>
+<div class="flex items-center space-x-2 mb-3">
+<div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <span class="material-symbols-outlined text-[18px] text-indigo-600">support_agent</span>
+              </div>
+<div>
+<h4 class="text-xs font-bold text-slate-800">Helpdesk Keuangan UPB</h4>
+<p class="text-[10px] text-slate-400">Gedung Rektorat Lt. 1, Cikarang Pusat</p>
+</div>
+</div>
+<!-- Operating Hours Pill -->
+<div class="p-2.5 bg-slate-50 rounded-xl text-[10px] text-slate-500 space-y-1 mb-3">
+<div class="flex justify-between"><span>Senin - Jumat:</span><span class="font-semibold text-slate-700">08.00 - 16.30 WIB</span></div>
+<div class="flex justify-between"><span>Sabtu:</span><span class="font-semibold text-slate-700">08.00 - 14.00 WIB</span></div>
+</div>
+<!-- Contact Buttons -->
+<div class="space-y-2">
+<a class="w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-semibold flex items-center justify-between transition" href="https://wa.me/6281299008812" target="_blank">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span>WhatsApp Loket Keuangan</span>
+</span>
+<span class="font-mono text-[10px] text-emerald-600">+62 812-9900-8812</span>
+</a>
+<a class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-between transition" href="mailto:keuangan@pelitabangsa.ac.id">
+<span class="flex items-center gap-1.5">
+<span>✉️</span>
+<span>keuangan@pelitabangsa.ac.id</span>
+</span>
+<span class="text-[10px] text-slate-400">Email BAAK</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- END: Bento Grid -->
+</div>
+<!-- END: Main Content Area -->
+</main>
+<!-- END: Master Application Shell -->
+<!-- Toast Alert for Copy Actions -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-semibold" id="copy-toast">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span id="toast-message">Nomor Virtual Account disalin ke papan klip!</span>
+</div>
+<!-- Modal Dialog for Downloads -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" id="download-modal">
+<div class="bg-white rounded-[2rem] max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-800">Dokumen Resmi UPB</h4>
+<span class="text-[10px] text-slate-400">Terverifikasi Tanda Tangan Digital</span>
+</div>
+</div>
+<button class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition" onclick="closeDownloadModal()" type="button">✕</button>
+</div>
+<div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+<span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Nama Berkas</span>
+<p class="text-xs font-extrabold text-slate-800 mt-0.5" id="modal-doc-title">Surat Bebas Tunggakan Keuangan (PDF)</p>
+<p class="text-[10px] text-slate-500 mt-1">Dilengkapi QR-Code stempel resmi Biro Keuangan Universitas Pelita Bangsa untuk verifikasi UTS/UAS.</p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-600">
+<div class="flex justify-between py-1 border-b border-slate-100">
+<span>Nama Mahasiswa:</span>
+<span class="font-bold text-slate-800">Arni Yuniarni</span>
+</div>
+<div class="flex justify-between py-1 border-b border-slate-100">
+<span>NIM:</span>
+<span class="font-mono text-slate-800">312210542</span>
+</div>
+<div class="flex justify-between py-1 border-b border-slate-100">
+<span>Semester / Status:</span>
+<span class="font-semibold text-emerald-600">Semester 6 / LUNAS</span>
+</div>
+<div class="flex justify-between py-1">
+<span>Format File:</span>
+<span class="font-bold text-indigo-600">Adobe PDF Document (.pdf)</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-2">
+<button class="px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition" onclick="closeDownloadModal()" type="button">Batal</button>
+<button class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5" id="btn-modal-action" onclick="executeMockDownload()" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+<span>Unduh Sekarang</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Shared module -->
+<script src="js/shared.js"></script>
+<script src="js/tagihan.js"></script>
+</body></html>

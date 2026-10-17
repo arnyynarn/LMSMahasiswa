@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portal Akademik & Smart LMS - Universitas Pelita Bangsa</title>
+  <script>
+    if (localStorage.getItem('upb_logged_in') === 'false') {
+      window.location.href = 'login.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</head>
+<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f1f2fa; color: #4338ca;">
+  <p>Mengalihkan ke Portal Akademik Universitas Pelita Bangsa...</p>
+</body>
+</html>
